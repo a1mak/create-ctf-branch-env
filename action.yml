@@ -1,11 +1,17 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
-inputs:
-  milliseconds: # change this
-    required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+name: Create Contentful Branch Environment
+description: Create Contentful Branch Environment as part of CI
+author: 'Oleksandr Makarenko'
 runs:
-  using: 'node16'
-  main: 'dist/index.js'
+  using: node16
+  main: dist/index.js
+
+inputs:
+  source_environment_id: 
+    description: Contentful environment id that will be used as a source for a new environment ('master' by default)
+    default: master
+  environment_name_prefix:
+    description: Prefix added to branch name that is used to create new contentful environment ('GH-' by default)
+
+outputs:
+  environment_name:
+    description: The name of the Contentful environment created
