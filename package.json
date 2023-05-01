@@ -31,7 +31,7 @@
     "contentful-management": "^10.31.2"
   },
   "devDependencies": {
-    "@types/node": "^18.11.0",
+    "@types/node": "^18.16.3",
     "@typescript-eslint/parser": "^5.56.0",
     "@vercel/ncc": "^0.36.1",
     "eslint": "^8.36.0",
