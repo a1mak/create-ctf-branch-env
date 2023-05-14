@@ -50,10 +50,12 @@ function run(ctx) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const { SPACE_ID, MANAGEMENT_ACCESS_TOKEN } = process.env;
-            if (!SPACE_ID || !MANAGEMENT_ACCESS_TOKEN)
+            if (!SPACE_ID || !MANAGEMENT_ACCESS_TOKEN) {
                 throw Error('Contentful connecton data required. Please provide SPACE_ID and MANAGEMENT_ACCESS_TOKEN');
-            if (!isCreateBranchContext(ctx))
+            }
+            if (!isCreateBranchContext(ctx)) {
                 throw Error(`Event "${ctx.eventName}" on ref_type "${ctx.payload.ref_type}" is not supported. This action can be executed only on "create branch" event`);
+            }
             const payload = ctx.payload;
             const sourceEnvId = core.getInput('source_environment_id');
             const envNamePrefix = core.getInput('environment_name_prefix');
@@ -68,19 +70,35 @@ function run(ctx) {
                 core.info(`Contentful environment with name ${envName} already exists. Skipping action.`);
             }
             catch (error) {
-                if (!(error instanceof Error))
+                if (!(error instanceof Error)) {
                     throw error;
+                }
                 const response = JSON.parse(error.message);
-                if (response.status !== 404)
+                if (response.status !== 404) {
                     throw Error(error.message);
-                yield space.createEnvironmentWithId(envName, { name: envName }, sourceEnvId);
+                }
+                const { sys } = yield space.createEnvironmentWithId(envName, { name: envName }, sourceEnvId);
                 core.info(`Created contentful environment ${envName}`);
                 core.setOutput('environment_name', envName);
+                const newEnv = {
+                    sys: {
+                        type: 'Link',
+                        linkType: 'Environment',
+                        id: sys.id
+                    }
+                };
+                const { items: keys } = yield space.getApiKeys();
+                yield Promise.all(keys.map(key => {
+                    core.info(`Updating: "${key.sys.id}"`);
+                    key.environments.push(newEnv);
+                    return key.update();
+                }));
             }
         }
         catch (error) {
-            if (error instanceof Error)
+            if (error instanceof Error) {
                 core.setFailed(error.message);
+            }
         }
     });
 }

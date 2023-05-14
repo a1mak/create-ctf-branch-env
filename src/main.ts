@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import { context } from '@actions/github'
-import { Context } from '@actions/github/lib/context'
-import { CreateEvent } from '@octokit/webhooks-types'
+import type { Context } from '@actions/github/lib/context'
+import type { CreateEvent } from '@octokit/webhooks-types'
 import { createClient } from 'contentful-management'
 import { normalizeBranchName } from './utils/normalize-branch-name'
 
@@ -17,15 +17,17 @@ async function run(ctx: Context): Promise<void> {
   try {
     const { SPACE_ID, MANAGEMENT_ACCESS_TOKEN } = process.env
 
-    if (!SPACE_ID || !MANAGEMENT_ACCESS_TOKEN)
+    if (!SPACE_ID || !MANAGEMENT_ACCESS_TOKEN) {
       throw Error(
         'Contentful connecton data required. Please provide SPACE_ID and MANAGEMENT_ACCESS_TOKEN'
       )
+    }
 
-    if (!isCreateBranchContext(ctx))
+    if (!isCreateBranchContext(ctx)) {
       throw Error(
         `Event "${ctx.eventName}" on ref_type "${ctx.payload.ref_type}" is not supported. This action can be executed only on "create branch" event`
       )
+    }
 
     const payload = ctx.payload
 
@@ -48,13 +50,17 @@ async function run(ctx: Context): Promise<void> {
         `Contentful environment with name ${envName} already exists. Skipping action.`
       )
     } catch (error) {
-      if (!(error instanceof Error)) throw error
+      if (!(error instanceof Error)) {
+        throw error
+      }
 
       const response = JSON.parse(error.message)
 
-      if (response.status !== 404) throw Error(error.message)
+      if (response.status !== 404) {
+        throw Error(error.message)
+      }
 
-      await space.createEnvironmentWithId(
+      const { sys } = await space.createEnvironmentWithId(
         envName,
         { name: envName },
         sourceEnvId
@@ -62,9 +68,28 @@ async function run(ctx: Context): Promise<void> {
 
       core.info(`Created contentful environment ${envName}`)
       core.setOutput('environment_name', envName)
+
+      const newEnv = {
+        sys: {
+          type: 'Link',
+          linkType: 'Environment',
+          id: sys.id
+        }
+      }
+      const { items: keys } = await space.getApiKeys()
+
+      await Promise.all(
+        keys.map(key => {
+          core.info(`Updating: "${key.sys.id}"`)
+          key.environments.push(newEnv)
+          return key.update()
+        })
+      )
     }
   } catch (error) {
-    if (error instanceof Error) core.setFailed(error.message)
+    if (error instanceof Error) {
+      core.setFailed(error.message)
+    }
   }
 }
 
