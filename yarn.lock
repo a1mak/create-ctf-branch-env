@@ -1352,10 +1352,10 @@ concat-map@0.0.1:
   resolved "https://registry.yarnpkg.com/concat-map/-/concat-map-0.0.1.tgz#d8a96bd77fd68df7793a73036a3ba0d5405d477b"
   integrity sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==
 
-contentful-management@^10.31.2:
-  version "10.31.2"
-  resolved "https://registry.yarnpkg.com/contentful-management/-/contentful-management-10.31.2.tgz#b11e2caa6c36e3c16dd85735e1c7e3b5afbb032e"
-  integrity sha512-Hh4rAJz8uGLmPhJ5NDMi+nHDbFrZZM7RMSk/90CN8kgWusqhQuAUtx10Hz8xg+i7ACqKkPif/btLQmSOa2toMA==
+contentful-management@^10.35.6:
+  version "10.35.6"
+  resolved "https://registry.yarnpkg.com/contentful-management/-/contentful-management-10.35.6.tgz#7d76514f8e68a0e6f6757508066e4d842a3b961d"
+  integrity sha512-35tHt5zUPmtpTyrE8wqFro2Wzy50vBZ5z2vevAoWaiu/5onwyzq8FNj2aJBJzciNF1pDIMD/pB5YUKKlCk1bmQ==
   dependencies:
     "@contentful/rich-text-types" "^16.0.3"
     "@types/json-patch" "0.0.30"
